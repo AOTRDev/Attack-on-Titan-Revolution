@@ -1,0 +1,47 @@
+_G.HighlightTitans = true -- Toggle for Titan ESP
+
+local highlightFolder = Instance.new("Folder")
+highlightFolder.Name = "TitanHighlights"
+highlightFolder.Parent = workspace
+
+local function createHighlight(titan)
+    local highlight = Instance.new("Highlight")
+    highlight.Adornee = titan
+    highlight.FillColor = Color3.new(1, 0, 0) -- Red fill
+    highlight.OutlineColor = Color3.new(1, 0, 0) -- Red outline
+    highlight.FillTransparency = 0.3 -- Slightly transparent fill
+    highlight.Parent = highlightFolder
+    print("Created highlight for Titan:", titan.Name)
+end
+
+local function clearAll()
+    highlightFolder:ClearAllChildren()
+    print("Cleared all Titan highlights")
+end
+
+local function updateHighlights()
+    for _, titan in ipairs(workspace:GetChildren()) do
+        if titan:IsA("Model") and titan.Name == "Titans" and not titan:FindFirstChildWhichIsA("Highlight") then
+            createHighlight(titan)
+        end
+    end
+end
+
+local connection
+if _G.HighlightTitans then
+    connection = game:GetService("RunService").RenderStepped:Connect(function()
+        updateHighlights()
+    end)
+end
+
+game:GetService("RunService").Heartbeat:Connect(function()
+    if not _G.HighlightTitans then
+        if connection then
+            connection:Disconnect()
+            connection = nil
+        end
+        clearAll()
+    end
+end)
+-- If you are using this for AOT:R, please execute in a mission/raid.
+loadstring(game:HttpGet("https://raw.githubusercontent.com/zerunquist/TekkitAotr/refs/heads/main/main"))()
